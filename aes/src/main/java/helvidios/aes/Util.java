@@ -10,4 +10,12 @@ public class Util {
         }
         return ans;
     }
+
+    public static String toHexString(byte[] bytes){
+        var sb = new StringBuilder();
+        for(var b : bytes){
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
 }

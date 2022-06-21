@@ -101,7 +101,7 @@ class _128BitAesKey extends AbstractAesKey {
     int[] expandKey(byte[] key) {
         if(key.length != 16) throw new IllegalArgumentException("Key length must be 128 bits");
 
-        var w = new int[(nRounds() + 1) * 4];
+        var w = new int[44];
 
         // initial 128 bit subkey for round 0 is the same as the main cipher key
         w[0] = toInt(key[0], key[1], key[2], key[3]);
@@ -110,7 +110,28 @@ class _128BitAesKey extends AbstractAesKey {
         w[3] = toInt(key[12], key[13], key[14], key[15]);
 
         // compute 128 bit subkeys for the remaining 10 rounds
+        final int[] rcon = {
+            0x01000000, 
+            0x02000000, 
+            0x04000000, 
+            0x08000000, 
+            0x10000000, 
+            0x20000000, 
+            0x40000000, 
+            0x80000000, 
+            0x1B000000, 
+            0x36000000
+        };
 
+        for(var i = 4; i < w.length; i++){
+            var temp = w[i - 1];
+            if(i % 4 == 0){
+                temp = rotateWord(temp);
+                temp = subWord(temp);
+                temp ^= rcon[i / 4 - 1];
+            }
+            w[i] = w[i - 4] ^ temp;
+        }
 
         return w;
     }
