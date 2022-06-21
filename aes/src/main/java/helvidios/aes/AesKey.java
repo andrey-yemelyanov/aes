@@ -58,19 +58,24 @@ abstract class AbstractAesKey implements AesKey {
     }
 
     int rotateWord(int w){
-        var byte1 = (byte) ((w >> 24) & 0xFF);
-        var byte2 = (byte) ((w >> 16) & 0xFF);
-        var byte3 = (byte) ((w >> 8) & 0xFF);
-        var byte4 = (byte) (w & 0xFF);
-        return (byte2 << 24) | (byte3 << 16) | (byte4 << 8) | byte1;
+        var b1 = (byte) ((w >> 24) & 0xFF);
+        var b2 = (byte) ((w >> 16) & 0xFF);
+        var b3 = (byte) ((w >> 8) & 0xFF);
+        var b4 = (byte) (w & 0xFF);
+        return toInt(b2, b3, b4, b1);
     }
 
     int subWord(int w){
-        var byte1 = (byte) ((w >> 24) & 0xFF);
-        var byte2 = (byte) ((w >> 16) & 0xFF);
-        var byte3 = (byte) ((w >> 8) & 0xFF);
-        var byte4 = (byte) (w & 0xFF);
-        return (SBox.substitute(byte1) << 24) | (SBox.substitute(byte2) << 16) | (SBox.substitute(byte3) << 8) | SBox.substitute(byte4);
+        var b1 = (byte) ((w >> 24) & 0xFF);
+        var b2 = (byte) ((w >> 16) & 0xFF);
+        var b3 = (byte) ((w >> 8) & 0xFF);
+        var b4 = (byte) (w & 0xFF);
+        return toInt(
+            SBox.substitute(b1), 
+            SBox.substitute(b2), 
+            SBox.substitute(b3), 
+            SBox.substitute(b4)
+        );
     }
 
     int toInt(byte b1, byte b2, byte b3, byte b4) {
