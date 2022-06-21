@@ -44,7 +44,6 @@ public class AesKeyTest {
 
         var round1SubKey = key.getSubkey(1);
         expected = Util.toByteArray("a0fafe1788542cb123a339392a6c7605");
-        System.out.println(Util.toHexString(round1SubKey));
         assertArrayEquals(expected, round1SubKey);
 
         var round2SubKey = key.getSubkey(2);
