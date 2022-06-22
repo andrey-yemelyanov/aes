@@ -82,4 +82,24 @@ public class AesKeyTest {
         expected = Util.toByteArray("d014f9a8c9ee2589e13f0cc8b6630ca6");
         assertArrayEquals(expected, round10SubKey);
     }
+
+    @Test
+    public void shouldGenerateAesKey() throws Exception{
+        final String password = "sglkjg034j33??4jggg,/,40igkeg23;";
+        var _128BitKey = AesKey.fromPassword(password, AesKeyType._128_bit);
+        var _192BitKey = AesKey.fromPassword(password, AesKeyType._192_bit);
+        var _256BitKey = AesKey.fromPassword(password, AesKeyType._256_bit);
+
+        System.out.println(_128BitKey);
+        System.out.println(_192BitKey);
+        System.out.println(_256BitKey);
+
+        assertEquals("32542f46146d2c12657043f074c0b4b6", _128BitKey.toString());
+        assertEquals("32542f46146d2c12657043f074c0b4b666adf8adc1f6242b", _192BitKey.toString());
+        assertEquals("32542f46146d2c12657043f074c0b4b666adf8adc1f6242bc7db1b30b2e54074", _256BitKey.toString());
+
+        assertEquals(16, _128BitKey.length());
+        assertEquals(24, _192BitKey.length());
+        assertEquals(32, _256BitKey.length());
+    }
 }

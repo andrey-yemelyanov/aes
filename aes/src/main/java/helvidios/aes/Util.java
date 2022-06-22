@@ -1,8 +1,8 @@
 package helvidios.aes;
 
-public class Util {
+class Util {
     
-    public static byte[] toByteArray(String hex){
+    static byte[] toByteArray(String hex){
         var ans = new byte[hex.length() / 2];
         for (int i = 0; i < ans.length; i++) {
             int index = i * 2;
@@ -12,7 +12,7 @@ public class Util {
         return ans;
     }
 
-    public static String toHexString(byte[] bytes){
+    static String toHexString(byte[] bytes){
         var sb = new StringBuilder();
         for(var b : bytes){
             sb.append(String.format("%02x", b));
@@ -20,14 +20,14 @@ public class Util {
         return sb.toString();
     }
 
-    public static int toInt(byte b1, byte b2, byte b3, byte b4) {
+    static int toInt(byte b1, byte b2, byte b3, byte b4) {
         return  ((b1 & 0xFF) << 24) |
                 ((b2 & 0xFF) << 16) |
                 ((b3 & 0xFF) << 8) |
                 ((b4 & 0xFF) << 0);
     }
 
-    public static byte[] getBytes(int w){
+    static byte[] getBytes(int w){
         return new byte[] {
             (byte) ((w >> 24) & 0xFF),
             (byte) ((w >> 16) & 0xFF),
@@ -40,7 +40,7 @@ public class Util {
      * Galois Field (256) Multiplication of two Bytes.
      * Borrowed from https://en.wikipedia.org/wiki/Rijndael_MixColumns
      */
-    public static byte GMul(byte a, byte b) { // 
+    static byte GMul(byte a, byte b) { // 
         byte p = 0;
     
         for (int counter = 0; counter < 8; counter++) {

@@ -1,8 +1,18 @@
 package helvidios.aes;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Objects;
 
 interface AesKey {
+
+    private static byte[] keyFromPassword(String password, AesKeyType keyType) throws NoSuchAlgorithmException{
+        var md = MessageDigest.getInstance("SHA-256");
+        md.update(password.getBytes());
+        var digest = md.digest();
+        return Arrays.copyOf(digest, keyType.keyLen());
+    }
 
     static AesKey from(byte[] data){
         Objects.requireNonNull(data, "Key data must not be null");
@@ -13,6 +23,10 @@ interface AesKey {
         throw new IllegalArgumentException(String.format("Key of length %d bits is not supported.", keyLen));
     }
 
+    static AesKey fromPassword(String password, AesKeyType keyType) throws Exception {
+        return from(keyFromPassword(password, keyType));
+    }
+
     /**
      * Returns a 128-bit subkey for a specific encryption/decryption round.
      * @param round current round
@@ -21,15 +35,35 @@ interface AesKey {
     byte[] getSubkey(int round);
 
     int nRounds();
+
+    byte[] toByteArray();
+
+    int length();
 }
 
 abstract class AbstractAesKey implements AesKey {
 
     private final int[] W; // key expansion array
+    private final byte[] key;
 
     AbstractAesKey(byte[] key) {
-        Objects.requireNonNull(key, "key must not be null");
+        this.key = Objects.requireNonNull(key, "key must not be null");
         this.W = expandKey(key);
+    }
+
+    @Override
+    public String toString(){
+        return Util.toHexString(key);
+    }
+
+    @Override
+    public int length(){
+        return key.length;
+    }
+
+    @Override
+    public byte[] toByteArray(){
+        return key;
     }
 
     abstract int[] expandKey(byte[] key);
@@ -139,7 +173,7 @@ class _192BitAesKey extends AbstractAesKey {
 
     @Override
     int[] expandKey(byte[] key) {
-        throw new IllegalStateException("192 bit key support is not yet implemented");
+        return null;
     }
 }
 
@@ -156,7 +190,7 @@ class _256BitAesKey extends AbstractAesKey {
 
     @Override
     int[] expandKey(byte[] key) {
-        throw new IllegalStateException("256 bit key support is not yet implemented");
+        return null;
     }
 
 }

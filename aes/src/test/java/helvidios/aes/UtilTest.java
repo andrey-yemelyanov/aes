@@ -2,6 +2,9 @@ package helvidios.aes;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+
+import java.security.NoSuchAlgorithmException;
+
 import org.junit.Test;
 
 public class UtilTest {
