@@ -1,18 +1,10 @@
 package helvidios.aes;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
 
 interface AesKey {
-
-    private static byte[] keyFromPassword(String password, AesKeyType keyType) throws NoSuchAlgorithmException{
-        var md = MessageDigest.getInstance("SHA-256");
-        md.update(password.getBytes());
-        var digest = md.digest();
-        return Arrays.copyOf(digest, keyType.keyLen());
-    }
 
     static AesKey from(byte[] data){
         Objects.requireNonNull(data, "Key data must not be null");
@@ -24,7 +16,10 @@ interface AesKey {
     }
 
     static AesKey fromPassword(String password, AesKeyType keyType) throws Exception {
-        return from(keyFromPassword(password, keyType));
+        var md = MessageDigest.getInstance("SHA-256");
+        md.update(password.getBytes());
+        var digest = md.digest();
+        return from(Arrays.copyOf(digest, keyType.keyLen()));
     }
 
     /**
