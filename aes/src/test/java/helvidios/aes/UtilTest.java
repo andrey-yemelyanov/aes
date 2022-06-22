@@ -2,7 +2,6 @@ package helvidios.aes;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 public class UtilTest {
@@ -32,5 +31,25 @@ public class UtilTest {
         var actual = Util.toHexString(bytes);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void shouldConvertToInt(){
+        var b = new byte[] {1, 2, 3, 4};
+        assertEquals(0x01020304, Util.toInt(b[0], b[1], b[2], b[3]));
+
+        b = new byte[] {(byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF};
+        assertEquals(-1, Util.toInt(b[0], b[1], b[2], b[3]));
+    }
+
+    @Test
+    public void shouldConvertToBytes(){
+        var w = 0xFFFFFFFF;
+        var expected = new byte[] {(byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF};
+        assertArrayEquals(expected, Util.getBytes(w));
+
+        w = 0x01020304;
+        expected = new byte[] {1, 2, 3, 4};
+        assertArrayEquals(expected, Util.getBytes(w));
     }
 }

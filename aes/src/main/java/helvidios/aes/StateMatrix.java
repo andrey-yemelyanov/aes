@@ -1,6 +1,7 @@
 package helvidios.aes;
 
 import java.util.Objects;
+import static helvidios.aes.Util.GMul;
 
 class StateMatrix {
 
@@ -40,12 +41,92 @@ class StateMatrix {
             });
     }
 
-    StateMatrix mixColumn(){
-        return null;
+    StateMatrix mixColumns(){
+        final byte[][] c = {
+            {02, 03, 01, 01},
+            {01, 02, 03, 01},
+            {01, 01, 02, 03},
+            {03, 01, 01, 02}
+        };
+
+        var state = new byte[4][4];
+
+        for(var col = 0; col < 4; col++){
+
+            state[0][col] = (byte) (
+                GMul(c[0][0], m[0][col]) ^ 
+                GMul(c[0][1], m[1][col]) ^ 
+                GMul(c[0][2], m[2][col]) ^ 
+                GMul(c[0][3], m[3][col])
+            );
+
+            state[1][col] = (byte) (
+                GMul(c[1][0], m[0][col]) ^ 
+                GMul(c[1][1], m[1][col]) ^ 
+                GMul(c[1][2], m[2][col]) ^ 
+                GMul(c[1][3], m[3][col])
+            );
+
+            state[2][col] = (byte) (
+                GMul(c[2][0], m[0][col]) ^ 
+                GMul(c[2][1], m[1][col]) ^ 
+                GMul(c[2][2], m[2][col]) ^ 
+                GMul(c[2][3], m[3][col])
+            );
+
+            state[3][col] = (byte) (
+                GMul(c[3][0], m[0][col]) ^ 
+                GMul(c[3][1], m[1][col]) ^ 
+                GMul(c[3][2], m[2][col]) ^ 
+                GMul(c[3][3], m[3][col])
+            );
+        }
+
+        return new StateMatrix(state);
     }
 
-    StateMatrix invMixColumn(){
-        return null;
+    StateMatrix invMixColumns(){
+        final byte[][] c = {
+            {0x0e, 0x0b, 0x0d, 0x09},
+            {0x09, 0x0e, 0x0b, 0x0d},
+            {0x0d, 0x09, 0x0e, 0x0b},
+            {0x0b, 0x0d, 0x09, 0x0e}
+        };
+
+        var state = new byte[4][4];
+
+        for(var col = 0; col < 4; col++){
+
+            state[0][col] = (byte) (
+                GMul(c[0][0], m[0][col]) ^ 
+                GMul(c[0][1], m[1][col]) ^ 
+                GMul(c[0][2], m[2][col]) ^ 
+                GMul(c[0][3], m[3][col])
+            );
+
+            state[1][col] = (byte) (
+                GMul(c[1][0], m[0][col]) ^ 
+                GMul(c[1][1], m[1][col]) ^ 
+                GMul(c[1][2], m[2][col]) ^ 
+                GMul(c[1][3], m[3][col])
+            );
+
+            state[2][col] = (byte) (
+                GMul(c[2][0], m[0][col]) ^ 
+                GMul(c[2][1], m[1][col]) ^ 
+                GMul(c[2][2], m[2][col]) ^ 
+                GMul(c[2][3], m[3][col])
+            );
+
+            state[3][col] = (byte) (
+                GMul(c[3][0], m[0][col]) ^ 
+                GMul(c[3][1], m[1][col]) ^ 
+                GMul(c[3][2], m[2][col]) ^ 
+                GMul(c[3][3], m[3][col])
+            );
+        }
+
+        return new StateMatrix(state);
     }
 
     StateMatrix substituteBytes(){

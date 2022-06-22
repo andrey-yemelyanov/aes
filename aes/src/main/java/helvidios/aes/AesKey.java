@@ -13,6 +13,11 @@ interface AesKey {
         throw new IllegalArgumentException(String.format("Key of length %d bits is not supported.", keyLen));
     }
 
+    /**
+     * Returns a 128-bit subkey for a specific encryption/decryption round.
+     * @param round current round
+     * @return 128-bit subkey
+     */
     byte[] getSubkey(int round);
 
     int nRounds();
@@ -41,48 +46,32 @@ abstract class AbstractAesKey implements AesKey {
         var subkey = new byte[16]; // 128 bit subkey
 
         for(var i = 4 * round; i < 4 * (round + 1); i++){
-            var byte1 = (byte)((W[i] >> 24) & 0xFF);
-            var byte2 = (byte)((W[i] >> 16) & 0xFF);
-            var byte3 = (byte)((W[i] >> 8) & 0xFF);
-            var byte4 = (byte)( W[i] & 0xFF);
+            var bytes = Util.getBytes(W[i]);
 
             var j = (i - 4 * round) * 4;
 
-            subkey[j]     = byte1;
-            subkey[j + 1] = byte2;
-            subkey[j + 2] = byte3;
-            subkey[j + 3] = byte4;
+            subkey[j]     = bytes[0];
+            subkey[j + 1] = bytes[1];
+            subkey[j + 2] = bytes[2];
+            subkey[j + 3] = bytes[3];
         }
 
         return subkey;
     }
 
     int rotateWord(int w){
-        var b1 = (byte) ((w >> 24) & 0xFF);
-        var b2 = (byte) ((w >> 16) & 0xFF);
-        var b3 = (byte) ((w >> 8) & 0xFF);
-        var b4 = (byte) (w & 0xFF);
-        return toInt(b2, b3, b4, b1);
+        var bytes = Util.getBytes(w);
+        return Util.toInt(bytes[1], bytes[2], bytes[3], bytes[0]);
     }
 
     int subWord(int w){
-        var b1 = (byte) ((w >> 24) & 0xFF);
-        var b2 = (byte) ((w >> 16) & 0xFF);
-        var b3 = (byte) ((w >> 8) & 0xFF);
-        var b4 = (byte) (w & 0xFF);
-        return toInt(
-            SBox.substitute(b1), 
-            SBox.substitute(b2), 
-            SBox.substitute(b3), 
-            SBox.substitute(b4)
+        var bytes = Util.getBytes(w);
+        return Util.toInt(
+            SBox.substitute(bytes[0]), 
+            SBox.substitute(bytes[1]), 
+            SBox.substitute(bytes[2]), 
+            SBox.substitute(bytes[3])
         );
-    }
-
-    int toInt(byte b1, byte b2, byte b3, byte b4) {
-        return  ((b1 & 0xFF) << 24) |
-                ((b2 & 0xFF) << 16) |
-                ((b3 & 0xFF) << 8) |
-                ((b4 & 0xFF) << 0);
     }
 }
 
@@ -104,10 +93,10 @@ class _128BitAesKey extends AbstractAesKey {
         var w = new int[44];
 
         // initial 128 bit subkey for round 0 is the same as the main cipher key
-        w[0] = toInt(key[0], key[1], key[2], key[3]);
-        w[1] = toInt(key[4], key[5], key[6], key[7]);
-        w[2] = toInt(key[8], key[9], key[10], key[11]);
-        w[3] = toInt(key[12], key[13], key[14], key[15]);
+        w[0] = Util.toInt(key[0], key[1], key[2], key[3]);
+        w[1] = Util.toInt(key[4], key[5], key[6], key[7]);
+        w[2] = Util.toInt(key[8], key[9], key[10], key[11]);
+        w[3] = Util.toInt(key[12], key[13], key[14], key[15]);
 
         // compute 128 bit subkeys for the remaining 10 rounds
         final int[] rcon = {

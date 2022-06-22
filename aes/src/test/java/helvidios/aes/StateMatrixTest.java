@@ -78,7 +78,7 @@ public class StateMatrixTest {
     public void shouldMixColumns(){
         var block = "d4bf5d30e0b452aeb84111f11e2798e5";
         var state = new StateMatrix(Util.toByteArray(block));
-        state = state.mixColumn();
+        state = state.mixColumns();
         var expectedState = "046681e5e0cb199a48f8d37a2806264c";
         var actualState = Util.toHexString(state.toByteArray());
         assertEquals(expectedState, actualState);
@@ -88,7 +88,7 @@ public class StateMatrixTest {
     public void shouldInvMixColumns(){
         var block = "046681e5e0cb199a48f8d37a2806264c";
         var state = new StateMatrix(Util.toByteArray(block));
-        state = state.invMixColumn();
+        state = state.invMixColumns();
         var expectedState = "d4bf5d30e0b452aeb84111f11e2798e5";
         var actualState = Util.toHexString(state.toByteArray());
         assertEquals(expectedState, actualState);
