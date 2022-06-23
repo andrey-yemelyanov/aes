@@ -6,20 +6,38 @@ import java.util.Objects;
 
 interface AesKey {
 
+    /**
+     * Creates an AES key from key bytes. Supported key length is 128, 192 or 256 bits.
+     * @param data key data
+     * @return AES key implementation
+     */
     static AesKey from(byte[] data){
         Objects.requireNonNull(data, "Key data must not be null");
-        var keyLen = data.length * 8;
-        if(keyLen == 128) return new _128BitAesKey(data);
-        if(keyLen == 192) return new _192BitAesKey(data);
-        if(keyLen == 256) return new _256BitAesKey(data);
-        throw new IllegalArgumentException(String.format("Key of length %d bits is not supported.", keyLen));
+        if(data.length == 16) return new _128BitAesKey(data);
+        if(data.length == 24) return new _192BitAesKey(data);
+        if(data.length == 32) return new _256BitAesKey(data);
+        throw new IllegalArgumentException(String.format("Key of length %d bits is not supported.", data.length * 8));
     }
 
+    /**
+     * Creates an AES key from a specified password.
+     * @param password from which key bytes will be generated
+     * @param keyType 128, 192 or 256 bit key type
+     * @return AES key of specific type
+     * @throws Exception if password cannot be converted to a vector of bits
+     */
     static AesKey fromPassword(String password, AesKeyType keyType) throws Exception {
         var md = MessageDigest.getInstance("SHA-256");
         md.update(password.getBytes());
         var digest = md.digest();
         return from(Arrays.copyOf(digest, keyType.keyLen()));
+    }
+
+    /**
+     * Generates a cryptographically secure random AES key of specified length.
+     */
+    static AesKey randomKey(AesKeyType keyType){
+        return from(Util.randomBytes(keyType.keyLen()));
     }
 
     /**

@@ -1,77 +1,85 @@
 package helvidios.aes;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 class CbcCipher implements AesCipher {
 
-    private final BlockCipher cipher = new BlockCipher();
+    private final BlockCipher blockCipher;
 
-    private static byte[] randomIV(){
-        var IV = new byte[16];
-        for(var i = 0; i < IV.length; i++){
-            IV[i] = (byte) ThreadLocalRandom.current().nextInt();
+    CbcCipher(BlockCipher blockCipher){
+        this.blockCipher = Objects.requireNonNull(blockCipher, "blockCipher must not be null");
+    }
+
+    @Override
+    public byte[] encrypt(byte[] data, byte[] key) throws IOException {
+        try(var input = new ByteArrayInputStream(data);
+            var output = new ByteArrayOutputStream()){
+            encrypt(input, output, key);
+            return output.toByteArray();
         }
-        return IV;
     }
 
-    private List<byte[]> getBlocks(byte[] data){
-        var blocks = new ArrayList<byte[]>();
-
-        return blocks;
+    @Override
+    public byte[] decrypt(byte[] data, byte[] key) throws IOException {
+        try(var input = new ByteArrayInputStream(data);
+            var output = new ByteArrayOutputStream()){
+            decrypt(input, output, key);
+            return output.toByteArray();
+        }
     }
 
-    private byte[] xor(byte[] b1, byte[] b2){
-        if(b1.length != b2.length) throw new IllegalArgumentException(
-            "Byte array lengths must be equal"
+    @Override
+    public void encrypt(InputStream input, OutputStream output, byte[] key) throws IOException {
+        Objects.requireNonNull(output, "output stream must not be null");
+        
+        var prevBlock = blockCipher.encrypt(Util.randomBytes(16), key); // random IV vector
+        // write IV vector to the output stream as prefix of cipher text
+        output.write(prevBlock);
+        
+        for(var blockIterator = new PKCS5BlockIterator(input); blockIterator.hasNext();){
+            var block = blockIterator.next();
+            block = blockCipher.encrypt(Util.xor(block, prevBlock), key);
+            output.write(block);
+            prevBlock = block;
+        }
+
+        output.flush();
+    }
+
+    @Override
+    public void decrypt(InputStream input, OutputStream output, byte[] key) throws IOException {
+        Objects.requireNonNull(output, "output stream must not be null");
+
+        var blockIterator = new PKCS5BlockIterator(input, false);
+
+        if(!blockIterator.hasNext()) throw new IllegalStateException(
+            "Invalid input stream"
         );
 
-        var xorResult = new byte[b1.length];
-        for(var i = 0; i < b1.length; i++){
-            xorResult[i] = (byte) (b1[i] ^ b2[i]);
+        var prevBlock = blockIterator.next(); // get encrypted IV
+
+        while(blockIterator.hasNext()){
+            var block = blockIterator.next();
+            var decryptedBlock = Util.xor(blockCipher.decrypt(block, key), prevBlock);
+            prevBlock = block;
+
+            var lastBlock = !blockIterator.hasNext();
+            if(lastBlock){
+                var lastByte = decryptedBlock[decryptedBlock.length - 1];
+                if(lastByte == 16) break;
+                output.write(Arrays.copyOfRange(decryptedBlock, 0, 16 - lastByte));
+                break;
+            }
+
+            output.write(decryptedBlock);
         }
 
-        return xorResult;
-    }
-
-    @Override
-    public byte[] encrypt(byte[] data, byte[] key) {
-        var blocks = getBlocks(data);
-        if(blocks.isEmpty()) throw new IllegalArgumentException("data is empty, nothing to encrypt");
-
-        var iv = randomIV();
-        var output = new byte[(blocks.size() + 1) * 16];
-        System.arraycopy(iv, 0, output, 0, iv.length);
-        var offset = iv.length;
-        var prevBlock = iv;
-
-        for(var block : blocks){
-            block = xor(block, prevBlock);
-            var cipherBytes = cipher.encrypt(block, key);
-            System.arraycopy(cipherBytes, 0, output, offset, cipherBytes.length);
-            offset += cipherBytes.length;
-            prevBlock = cipherBytes;
-        }
-
-        return output;
-    }
-
-    @Override
-    public byte[] decrypt(byte[] data, byte[] key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void encrypt(InputStream input, OutputStream output, byte[] key) {
-        throw new IllegalStateException("Encryption with I/O streams not supported in CBC mode.");
-    }
-
-    @Override
-    public void decrypt(InputStream input, OutputStream output, byte[] key) {
-        throw new IllegalStateException("Decryption with I/O streams not supported in CBC mode.");
+        output.flush();
     }
     
 }

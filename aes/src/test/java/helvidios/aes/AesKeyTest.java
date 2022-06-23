@@ -102,4 +102,19 @@ public class AesKeyTest {
         assertEquals(24, _192BitKey.length());
         assertEquals(32, _256BitKey.length());
     }
+
+    @Test
+    public void shouldGenerateRandomKey(){
+        var _128BitKey = AesKey.randomKey(AesKeyType._128_bit);
+        var _192BitKey = AesKey.randomKey(AesKeyType._192_bit);
+        var _256BitKey = AesKey.randomKey(AesKeyType._256_bit);
+
+        System.out.println(_128BitKey);
+        System.out.println(_192BitKey);
+        System.out.println(_256BitKey);
+
+        assertEquals(16, _128BitKey.length());
+        assertEquals(24, _192BitKey.length());
+        assertEquals(32, _256BitKey.length());
+    }
 }

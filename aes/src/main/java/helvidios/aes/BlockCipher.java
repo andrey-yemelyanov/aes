@@ -3,7 +3,7 @@ package helvidios.aes;
 /**
  * AES cipher for encryption and decryption of 128 bit blocks of data.
  */
-class BlockCipher {
+interface BlockCipher{
     
     /**
      * Encrypts a block of data with a symmetric key and produces a cipher text of the same length.
@@ -11,7 +11,20 @@ class BlockCipher {
      * @param key AES key of length 128, 192 or 256 bits
      * @return cipher text
      */
-    byte[] encrypt(byte[] block, byte[] key){
+    byte[] encrypt(byte[] block, byte[] key);
+
+    /**
+     * Decrypts a block of data with a symmetric key and produces plaintext.
+     * @param block 128 bit block of cipher text
+     * @param key AES key of length 128, 192 or 256 bits
+     * @return plaintext
+     */
+    byte[] decrypt(byte[] block, byte[] key);
+}
+
+class BlockCipherImpl implements BlockCipher {
+    
+    public byte[] encrypt(byte[] block, byte[] key){
         
         var aesKey = AesKey.from(key);
         
@@ -31,13 +44,7 @@ class BlockCipher {
                     .toByteArray();
     }
 
-    /**
-     * Decrypts a block of data with a symmetric key and produces plaintext.
-     * @param block 128 bit block of cipher text
-     * @param key AES key of length 128, 192 or 256 bits
-     * @return plaintext
-     */
-    byte[] decrypt(byte[] block, byte[] key){
+    public byte[] decrypt(byte[] block, byte[] key){
         
         var aesKey = AesKey.from(key);
         

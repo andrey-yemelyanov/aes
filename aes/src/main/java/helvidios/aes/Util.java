@@ -1,5 +1,7 @@
 package helvidios.aes;
 
+import java.security.SecureRandom;
+
 class Util {
     
     static byte[] toByteArray(String hex){
@@ -57,5 +59,25 @@ class Util {
         }
     
         return p;
+    }
+
+    public static byte[] xor(byte[] b1, byte[] b2){
+        if(b1.length != b2.length) throw new IllegalArgumentException(
+            "Byte array lengths must be equal"
+        );
+
+        var xorResult = new byte[b1.length];
+        for(var i = 0; i < b1.length; i++){
+            xorResult[i] = (byte) (b1[i] ^ b2[i]);
+        }
+
+        return xorResult;
+    }
+
+    public static byte[] randomBytes(int len){
+        var sr = new SecureRandom();
+        var bytes = new byte[len];
+        sr.nextBytes(bytes);
+        return bytes;
     }
 }
