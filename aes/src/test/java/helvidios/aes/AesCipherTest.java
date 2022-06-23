@@ -2,9 +2,7 @@ package helvidios.aes;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
-
 import org.junit.Test;
 
 public class AesCipherTest {
@@ -15,7 +13,7 @@ public class AesCipherTest {
     }
 
     @Test
-    public void encryptCbcWithPadding() throws Exception{
+    public void encryptCbcOneBlockWithPadding() throws Exception{
         var oneBlockWithPadding = new byte[] {
             1, 2, 3, 4, 5
         };
@@ -26,6 +24,56 @@ public class AesCipherTest {
 
         var expected = Util.toHexString(oneBlockWithPadding);
         var actual = Util.toHexString(cipher.decrypt(cipher.encrypt(oneBlockWithPadding, key), key));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void encryptCbcOneBlockNoPadding() throws Exception{
+        var oneBlockNoPadding = new byte[] {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
+        };
+
+        var cipher = AesCipher.forMode(AesCipher.Mode.CipherBlockChaining);
+        var key = AesKey.fromPassword("qwerty", AesKeyType._128_bit)
+                        .toByteArray();
+
+        var expected = Util.toHexString(oneBlockNoPadding);
+        var actual = Util.toHexString(cipher.decrypt(cipher.encrypt(oneBlockNoPadding, key), key));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void encryptTwoBlocksWithPadding() throws Exception{
+        var twoBlocksWithPadding = new byte[] {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+            17, 18, 19, 20
+        };
+
+        var cipher = AesCipher.forMode(AesCipher.Mode.CipherBlockChaining);
+        var key = AesKey.fromPassword("qwerty", AesKeyType._128_bit)
+                        .toByteArray();
+
+        var expected = Util.toHexString(twoBlocksWithPadding);
+        var actual = Util.toHexString(cipher.decrypt(cipher.encrypt(twoBlocksWithPadding, key), key));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void encryptTwoBlocksNoPadding() throws Exception{
+        var twoBlocksNoPadding = new byte[] {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+            17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
+        };
+
+        var cipher = AesCipher.forMode(AesCipher.Mode.CipherBlockChaining);
+        var key = AesKey.fromPassword("qwerty", AesKeyType._128_bit)
+                        .toByteArray();
+
+        var expected = Util.toHexString(twoBlocksNoPadding);
+        var actual = Util.toHexString(cipher.decrypt(cipher.encrypt(twoBlocksNoPadding, key), key));
 
         assertEquals(expected, actual);
     }

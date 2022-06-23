@@ -16,7 +16,7 @@ public class BlockIteratorTest {
         };
 
         try(var input = new ByteArrayInputStream(oneBlockWithPadding)){
-            var it = new PKCS5BlockIterator(input);
+            var it = new PKCS5PaddingBlockIterator(new BlockIterator(input));
             assertTrue(it.hasNext());
             var block = it.next();
             assertEquals(
@@ -33,7 +33,7 @@ public class BlockIteratorTest {
         };
 
         try(var input = new ByteArrayInputStream(oneBlockNoPadding)){
-            var it = new PKCS5BlockIterator(input);
+            var it = new PKCS5PaddingBlockIterator(new BlockIterator(input));
             assertTrue(it.hasNext());
             var block1 = it.next();
             assertEquals(
@@ -56,7 +56,7 @@ public class BlockIteratorTest {
         };
 
         try(var input = new ByteArrayInputStream(twoBlocksWithPadding)){
-            var it = new PKCS5BlockIterator(input);
+            var it = new PKCS5PaddingBlockIterator(new BlockIterator(input));
             assertTrue(it.hasNext());
             var block1 = it.next();
             assertEquals(
@@ -80,7 +80,7 @@ public class BlockIteratorTest {
         };
 
         try(var input = new ByteArrayInputStream(twoBlocksNoPadding)){
-            var it = new PKCS5BlockIterator(input);
+            var it = new PKCS5PaddingBlockIterator(new BlockIterator(input));
             assertTrue(it.hasNext());
             var block1 = it.next();
             assertEquals(

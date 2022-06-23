@@ -41,7 +41,7 @@ class CbcCipher implements AesCipher {
         // write IV vector to the output stream as prefix of cipher text
         output.write(prevBlock);
         
-        for(var blockIterator = new PKCS5BlockIterator(input); blockIterator.hasNext();){
+        for(var blockIterator = new PKCS5PaddingBlockIterator(new BlockIterator(input)); blockIterator.hasNext();){
             var block = blockIterator.next();
             block = blockCipher.encrypt(Util.xor(block, prevBlock), key);
             output.write(block);
@@ -55,7 +55,7 @@ class CbcCipher implements AesCipher {
     public void decrypt(InputStream input, OutputStream output, byte[] key) throws IOException {
         Objects.requireNonNull(output, "output stream must not be null");
 
-        var blockIterator = new PKCS5BlockIterator(input, false);
+        var blockIterator = new BlockIterator(input);
 
         if(!blockIterator.hasNext()) throw new IllegalStateException(
             "Invalid input stream"
