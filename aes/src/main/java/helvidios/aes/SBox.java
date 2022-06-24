@@ -1,5 +1,8 @@
 package helvidios.aes;
 
+/**
+ * SBox substitution table. Adapted from https://github.com/alexkiro/AES/blob/master/src/aes/SBox.java
+ */
 class SBox {
     
     private static final int[] box = {

@@ -16,7 +16,7 @@ public interface AesCipher {
     static AesCipher forMode(Mode mode){
         var blockCipher = new BlockCipherImpl();
         if(mode == Mode.CipherBlockChaining) return new CbcCipher(blockCipher);
-        if(mode == Mode.Counter) return new CtrCipher();
+        if(mode == Mode.Counter) return new CtrCipher(blockCipher);
         throw new IllegalArgumentException(
             String.format("Unsupported AES cipher mode: %s", mode.toString())
         );

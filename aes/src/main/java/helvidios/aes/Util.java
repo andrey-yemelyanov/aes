@@ -62,12 +62,8 @@ class Util {
     }
 
     public static byte[] xor(byte[] b1, byte[] b2){
-        if(b1.length != b2.length) throw new IllegalArgumentException(
-            "Byte array lengths must be equal"
-        );
-
-        var xorResult = new byte[b1.length];
-        for(var i = 0; i < b1.length; i++){
+        var xorResult = new byte[Math.min(b1.length, b2.length)];
+        for(var i = 0; i < xorResult.length; i++){
             xorResult[i] = (byte) (b1[i] ^ b2[i]);
         }
 

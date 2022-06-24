@@ -37,7 +37,7 @@ class CbcCipher implements AesCipher {
     public void encrypt(InputStream input, OutputStream output, byte[] key) throws IOException {
         Objects.requireNonNull(output, "output stream must not be null");
         
-        var prevBlock = blockCipher.encrypt(Util.randomBytes(16), key); // random IV vector
+        var prevBlock = Util.randomBytes(16); // random IV vector
         // write IV vector to the output stream as prefix of cipher text
         output.write(prevBlock);
         
@@ -61,7 +61,7 @@ class CbcCipher implements AesCipher {
             "Invalid input stream"
         );
 
-        var prevBlock = blockIterator.next(); // get encrypted IV
+        var prevBlock = blockIterator.next(); // get plaintext IV
 
         while(blockIterator.hasNext()){
             var block = blockIterator.next();
