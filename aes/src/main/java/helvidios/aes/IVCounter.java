@@ -30,39 +30,34 @@ interface IVCounter {
 
 class IVCounterImpl implements IVCounter {
 
-    private final byte[] IV;
+    private final BigInteger value;
 
-    IVCounterImpl(byte[] IV){
-        this.IV = IV;
+    IVCounterImpl(byte[] data){
+        this(new BigInteger(data));
+    }
+
+    IVCounterImpl(BigInteger IV){
+        this.value = IV;
     }
 
     @Override
     public IVCounter incrementIV() {
-        var counter = Arrays.copyOfRange(IV, 8, 16);
-        
-        var incCounter = new BigInteger(counter)
-            .add(BigInteger.valueOf(1))
-            .toByteArray();
-        
-        var newIV = new byte[16];
-        System.arraycopy(IV, 0, newIV, 0, 8);
-        System.arraycopy(incCounter, 0, newIV, 16 - incCounter.length, incCounter.length);
-        return new IVCounterImpl(newIV);
+        return new IVCounterImpl(value.add(BigInteger.valueOf(1)));
     }
 
     @Override
     public byte[] toByteArray() {
-        return IV;
+        return value.toByteArray();
     }
 
     @Override
     public byte[] getNonce() {
-        return Arrays.copyOfRange(IV, 0, 8);
+        return Arrays.copyOfRange(toByteArray(), 0, 8);
     }
 
     @Override
     public byte[] getCounter() {
-        return Arrays.copyOfRange(IV, 8, 16);
+        return Arrays.copyOfRange(toByteArray(), 8, 16);
     }
 
 }
